@@ -9,7 +9,11 @@ readme = "README.md"
 python = "^3.11"
 scrapy = "^2.10.1"
 scrapeops-scrapy = "^0.5.2"
+python-dotenv = "^1.0.0"
 
+
+[tool.poetry.group.dev.dependencies]
+pudb = "^2022.1.3"
 
 [build-system]
 requires = ["poetry-core"]
