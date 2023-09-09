@@ -4,10 +4,12 @@ from typing import List, Union
 import scrapy
 from scrapy.shell import inspect_response
 
+from ..items import JobItem
+
 
 class LinkedJobsSpider(scrapy.Spider):
     name = "linkedin-jobs"
-    SPACE_SYMBOL = "%20"
+    SPACE = "%20"
     API_BASE_URL = (
         "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?"
     )
@@ -19,7 +21,9 @@ class LinkedJobsSpider(scrapy.Spider):
         self.search_terms = search_terms
         # api_url = "keywords={}&location={}&start={}"
         self.API_URL = (
-            self.API_BASE_URL + "&keywords=Python" + "&location=United%20States"
+            self.API_BASE_URL
+            + "&keywords=((Python%20OR%20C++))"
+            + "&location=United%20States"
         )
 
     def start_requests(self):
@@ -36,14 +40,7 @@ class LinkedJobsSpider(scrapy.Spider):
     def parse_next_job_page(self, response):
         page_job_idx = response.meta["page_job_idx"]
 
-        job_item = {
-            # "title": str,
-            # "company": str,
-            # "company_link": str,
-            # "detail_url": str,
-            # "date_listed": str,
-            # "job_title": str,
-        }
+        job_item = JobItem()
         jobs = response.css("li")
 
         num_jobs_returned = len(jobs)
@@ -52,7 +49,7 @@ class LinkedJobsSpider(scrapy.Spider):
         print("*****")
 
         for job in jobs:
-            job_item["job_title"] = job.css("h3::text").get(default="not-found").strip()
+            # job_item["job_title"] = job.css("h3::text").get(default="not-found").strip()
             job_item["job_detail_url"] = (
                 job.css(".base-card__full-link::attr(href)")
                 .get(default="not-found")
@@ -60,22 +57,6 @@ class LinkedJobsSpider(scrapy.Spider):
             )
             job_detail_url = (
                 job.css(".base-card__full-link::attr(href)")
-                .get(default="not-found")
-                .strip()
-            )
-            job_item["job_detail_url"] = job_detail_url
-            job_item["job_listed"] = (
-                job.css("time::text").get(default="not-found").strip()
-            )
-
-            job_item["company_name"] = (
-                job.css("h4 a::text").get(default="not-found").strip()
-            )
-            job_item["company_link"] = job.css("h4 a::attr(href)").get(
-                default="not-found"
-            )
-            job_item["company_location"] = (
-                job.css(".job-search-card__location::text")
                 .get(default="not-found")
                 .strip()
             )
@@ -108,5 +89,9 @@ class LinkedJobsSpider(scrapy.Spider):
             # Parse the JSON-LD data
             data = json.loads(json_ld_data)
 
-        job_item.update(data)
+        job_item["title"] = data.pop("title", None)
+        job_item["datePosted"] = data.pop("datePosted", None)
+        job_item["description"] = data.pop("description", None)
+        job_item["employmentType"] = data.pop("employmentType", None)
+        job_item["dynamicData"] = data
         yield job_item

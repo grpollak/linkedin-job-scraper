@@ -25,7 +25,10 @@ NEWSPIDER_MODULE = "linkedin.spiders"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-# Scrape Proxy
+# DATABASE Connection
+MONGODB_URI = os.getenv("MONGODB_URI")
+MONGODB_DATABASE = os.getenv("MONGO_DATABASE")
+# SCRAPE PROXY
 SCRAPEOPS_API_KEY = os.getenv("SCRAPEOPS_API_KEY")
 
 SCRAPEOPS_PROXY_ENABLED = True
@@ -83,9 +86,10 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    "linkedin.pipelines.LinkedinPipeline": 300,
-# }
+ITEM_PIPELINES = {
+    # "linkedin.pipelines.LinkedinPipeline": 300,
+    "mongodb_crawler.pipelines.MongoDBPipeline": 500
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

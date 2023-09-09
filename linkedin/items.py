@@ -6,7 +6,11 @@
 import scrapy
 
 
-class LinkedinItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class JobItem(scrapy.Item):
+    title = scrapy.Field()
+    job_detail_url = scrapy.Field()
+    datePosted = scrapy.Field()
+    description = scrapy.Field()
+    employmentType = scrapy.Field()
+
+    dynamicData = scrapy.Field()
