@@ -56,6 +56,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
+DOWNLOAD_DELAY = 2.0
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
@@ -86,10 +87,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    # "linkedin.pipelines.LinkedinPipeline": 300,
-    "mongodb_crawler.pipelines.MongoDBPipeline": 500
-}
+ITEM_PIPELINES = {"linkedin.pipelines.MongoDBPipeline": 500}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
