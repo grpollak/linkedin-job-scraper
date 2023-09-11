@@ -1,10 +1,12 @@
+import logging
 import sys
 
 import pymongo
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from scrapy.exceptions import IgnoreRequest
 
 from .items import JobItem
+
+# useful for handling different item types with a single interface
 
 
 class LinkedinPipeline:
@@ -17,6 +19,7 @@ class MongoDBPipeline:
         self.mongodb_uri = mongodb_uri
         self.mongodb_db = mongodb_db
         self.mongodb_collection = mongodb_collection
+        self.logger = logging.getLogger(__name__)
         if not self.mongodb_uri:
             sys.exit("You need to provide a Connection String.")
 
@@ -38,6 +41,14 @@ class MongoDBPipeline:
 
     def close_spider(self, spider):
         self.client.close()
+
+    def process_request(self, request, spider):
+        collection = self.db[self.mongodb_collection]
+        if collection.find_one({"job_detail_url": request.url}):
+            self.logger.info(
+                f"URL {request.url} already exists in the database. Skipping..."
+            )
+            raise IgnoreRequest("URL already exists in the database")
 
     def process_item(self, job_item, spider):
         collection = self.db[self.mongodb_collection]
