@@ -1,0 +1,9 @@
+search_terms: "Python OR C++"
+location: "United States"
+period:
+  days: 30
+expirience_levels:
+  - "Internship"
+  - "Entry level"
+  - "Associate"
+  - "Mid-Senior level"

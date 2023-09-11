@@ -7,6 +7,7 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -18,6 +19,24 @@ BOT_NAME = "linkedin"
 SPIDER_MODULES = ["linkedin.spiders"]
 NEWSPIDER_MODULE = "linkedin.spiders"
 
+LOG_ENABLED = True
+LOG_STDOUT = False
+LOG_LEVEL = "WARNING"
+
+
+# Define a function to generate a timestamp string
+def generate_timestamp():
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+
+# Define the directory where you want to save the log files
+LOGS_DIR = "logs"
+
+# Ensure the logs directory exists
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+# Customize the log file path using the timestamp
+LOG_FILE = os.path.join(LOGS_DIR, f"scrapy_{generate_timestamp()}.log")
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "linkedin (+http://www.yourdomain.com)"
@@ -56,7 +75,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
-DOWNLOAD_DELAY = 2.0
+DOWNLOAD_DELAY = 3
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
