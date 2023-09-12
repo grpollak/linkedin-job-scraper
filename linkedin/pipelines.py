@@ -49,6 +49,8 @@ class MongoDBPipeline:
                 f"URL {request.url} already exists in the database. Skipping..."
             )
             raise IgnoreRequest("URL already exists in the database")
+        else:
+            return None
 
     def process_item(self, job_item, spider):
         collection = self.db[self.mongodb_collection]
