@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Dict, List, Union
 
 import scrapy
@@ -93,11 +93,9 @@ class LinkedJobsSpider(scrapy.Spider):
     def parse_next_job_page(self, response):
         page_job_idx = response.meta["page_job_idx"]
 
-        job_item = JobItem()
         jobs = response.css("li")
 
         num_jobs_returned = len(jobs)
-        print(f"{100*'='}\n{self.API_URL}\n{100*'='}")
 
         for job in jobs:
             job_detail_url = (
@@ -106,17 +104,16 @@ class LinkedJobsSpider(scrapy.Spider):
                 .strip()
                 .split("?")[0]
             )
-            job_item["job_detail_url"] = job_detail_url
-            print(f"{job_detail_url}")
+            print(job_detail_url)
             yield scrapy.Request(
                 url=job_detail_url,
                 callback=self.parse_job_details,
-                meta={"job_item": job_item},
             )
 
         if num_jobs_returned > 0:
             page_job_idx = int(page_job_idx) + num_jobs_returned
             next_url = self.API_URL + f"&start={page_job_idx}"
+            print(f"{100*'='}\n{next_url}\n{100*'='}")
             yield scrapy.Request(
                 url=next_url,
                 callback=self.parse_next_job_page,
@@ -124,8 +121,9 @@ class LinkedJobsSpider(scrapy.Spider):
             )
 
     def parse_job_details(self, response):
+        job_item = JobItem()
         data = {}
-        job_item = response.meta["job_item"]
+        print(response.url)
         # Process Detail Job
         json_ld_data = response.css('script[type="application/ld+json"]::text').get()
         if json_ld_data:
@@ -135,11 +133,26 @@ class LinkedJobsSpider(scrapy.Spider):
             data = json.loads(json_ld_data)
 
         job_item["title"] = data.pop("title", None)
+        job_item["dateScraped"] = datetime.now()
         job_item["datePosted"] = data.pop("datePosted", None)
+        job_item["validThrough"] = data.pop("skills", None)
+        job_item["job_detail_url"] = response.url
         job_item["description"] = data.pop("description", None)
         job_item["employmentType"] = data.pop("employmentType", None)
+        job_item["industry"] = data.pop("industry", None)
+        job_item["skills"] = data.pop("skills", None)
+        job_item["hiringOrganization"] = data.pop("hiringOrganization", None)
+        job_item["industry"] = data.pop("industry", None)
+        job_item["jobLocation"] = data.pop("jobLocation", None)
+        job_item["jobLocationType"] = data.pop("jobLocationType", None)
+        job_item["applicantLocationRequirements"] = data.pop(
+            "applicantLocationRequirements", None
+        )
+        job_item["educationRequirements"] = data.pop("educationRequirements", None)
+        job_item["identifier"] = data.pop("identifier", None)
+
         job_item["dynamicData"] = data
-        yield job_item
+        return job_item
 
         # # Check if response status is 429 (Too Many Requests)
         # if response.status == 429:
