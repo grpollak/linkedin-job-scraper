@@ -1,1 +1,4 @@
-SCRAPEOPS_API_KEY=
+SCRAPEOPS_API_KEY="Scrapeops API KEY"
+MONGODB_URI="<Database URI>"
+MONGO_DATABASE="<Database Name>"
+MONGODB_COLLECTION="<Collection Name>"
